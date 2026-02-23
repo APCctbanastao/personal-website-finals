@@ -13,6 +13,10 @@
   ],
   "routes": [
     {
+      "src": "/guestbook/(.*)",
+      "dest": "backend/src/main.ts"
+    },
+    {
       "src": "/guestbook",
       "dest": "backend/src/main.ts"
     },
