@@ -1,19 +1,26 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
-import { SupabaseService } from '../supabase/supabase.service';
+import { Controller, Get, Post, Delete, Body, Param, BadRequestException } from '@nestjs/common';
+import { GuestbookService } from './guestbook.service';
 
 @Controller('guestbook')
 export class GuestbookController {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(private readonly guestbookService: GuestbookService) {} // <--- THIS MUST MATCH THE CLASS NAME ABOVE
+  
 
-  // This handles GET requests (reading the data)
+
   @Get()
   async findAll() {
-    return this.supabaseService.getGuestbook();
+    return await this.guestbookService.getAllEntries();
   }
 
-  // This handles POST requests (sending new messages)
   @Post()
   async create(@Body() body: { name: string; message: string }) {
-    return this.supabaseService.addEntry(body.name, body.message);
+    return await this.guestbookService.createEntry(body.name, body.message);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    const response = await this.guestbookService.deleteEntry(id);
+    if (response.error) throw new BadRequestException(response.error.message);
+    return { status: 'REDACTED' };
   }
 }
