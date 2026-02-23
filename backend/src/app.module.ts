@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { SupabaseService } from './supabase/supabase.service';
 import { GuestbookController } from './guestbook/guestbook.controller';
+import { GuestbookService } from './guestbook/guestbook.service';
 
 @Module({
-  imports: [ConfigModule.forRoot()], // This line allows the .env to work
-  controllers: [AppController, GuestbookController],
-  providers: [AppService, SupabaseService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
+  controllers: [GuestbookController], // Register the controller here
+  providers: [GuestbookService],    // Register the service here
 })
 export class AppModule {}

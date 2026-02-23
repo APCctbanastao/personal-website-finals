@@ -3,9 +3,7 @@ import { GuestbookService } from './guestbook.service';
 
 @Controller('guestbook')
 export class GuestbookController {
-  constructor(private readonly guestbookService: GuestbookService) {} // <--- THIS MUST MATCH THE CLASS NAME ABOVE
-  
-
+  constructor(private readonly guestbookService: GuestbookService) {}
 
   @Get()
   async findAll() {
@@ -19,8 +17,6 @@ export class GuestbookController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    const response = await this.guestbookService.deleteEntry(id);
-    if (response.error) throw new BadRequestException(response.error.message);
-    return { status: 'REDACTED' };
+    return await this.guestbookService.deleteEntry(id);
   }
 }

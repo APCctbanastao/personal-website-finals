@@ -14,6 +14,7 @@
     <div class="hero-slate">
       <div class="metal-seams"></div>
       <div class="scanlines"></div>
+      
       <div class="user-signature">
         <span class="rank">OPERATOR:</span> CHRISTIAN BANASTAO
       </div>
@@ -43,8 +44,16 @@
 
               <div class="entries-list">
                 <div v-for="entry in guestbookEntries" :key="entry.id" class="entry-card">
-                  <span class="entry-name">[{{ entry.name }}]:</span>
+                  <div class="entry-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="entry-name">[{{ entry.name }}]:</span>
+                    <span class="entry-date" style="font-size: 0.8rem; opacity: 0.5; color: #66ff66;">{{ formatDate(entry.created_at) }}</span>
+                  </div>
                   <span class="entry-msg">{{ entry.message }}</span>
+                  
+                  <button @click="redactEntry(entry.id)" 
+                    style="display: block; margin-top: 10px; background: transparent; border: 1px dashed #ff3333; color: #ff3333; font-family: 'VT323', monospace; cursor: pointer; padding: 2px 5px; text-transform: uppercase;">
+                    [REDACTED]
+                  </button>
                 </div>
               </div>
             </div>
@@ -113,6 +122,7 @@ export default {
     }
   },
   created(){
+    // PARTICLE GENERATION
     for(let i=0;i<50;i++){
       this.particles.push({
         id:i, top:Math.random()*100+'%', left:Math.random()*100+'%',
@@ -120,12 +130,34 @@ export default {
         duration:3+Math.random()*7, delay:Math.random()*5
       });
     }
+    // HOLO GENERATION
     for(let i=0;i<this.holoCount;i++){
       this.holos.push({ top:Math.random()*100+'%', left:Math.random()*100+'%' });
     }
     this.startBootTyping();
   },
   methods:{
+    // FORMAT DATE METHOD
+    formatDate(dateString) {
+      if (!dateString) return '[DATE UNKNOWN]';
+      const date = new Date(dateString);
+      return `[${date.toLocaleDateString()}]`;
+    },
+    // REDACT ENTRY METHOD
+    async redactEntry(id) {
+      if (!confirm("CONFIRM EXTERMINATUS ON THIS RECORD?")) return;
+      try {
+        const response = await fetch(`/guestbook/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          await this.fetchGuestbook();
+        }
+      } catch (error) {
+        console.error("Redaction Failed:", error);
+      }
+    },
+    // BOOT TYPING LOGIC
     startBootTyping(){
       let i=0,lineIndex=0;
       this.typedLines=Array(this.bootLines.length).fill("");
@@ -141,6 +173,7 @@ export default {
       };
       type();
     },
+    // SECTION SELECTION
     async selectSection(section){
       this.currentSection=section;
       this.showBoot=false;
@@ -152,6 +185,7 @@ export default {
         this.startCardTyping();
       }
     },
+    // CARD TYPING LOGIC
     startCardTyping(){
       this.displayedCardText="";
       let text=this.cards[this.currentSection].content;
@@ -164,15 +198,16 @@ export default {
       };
       typeChar();
     },
+    // FETCH GUESTBOOK
     async fetchGuestbook() {
       try {
-        // Relative path for Vercel deployment
         const response = await fetch('/guestbook');
         this.guestbookEntries = await response.json();
       } catch (error) {
         console.error("Archive Access Denied:", error);
       }
     },
+    // SUBMIT MESSAGE
     async submitToRollOfHonor() {
       if (!this.newGuestName || !this.newGuestMessage) return;
       this.isSubmitting = true;
@@ -198,6 +233,7 @@ export default {
 </script>
 
 <style scoped>
+/* START FULL CSS BLOCK */
 .hero-container {
   width: 100vw;
   height: 100vh;
@@ -266,7 +302,7 @@ export default {
   box-shadow: 0 0 15px rgba(255, 51, 51, 0.5);
 }
 
-/* Guestbook Styles */
+/* GUESTBOOK SPECIFIC CSS */
 .guestbook-container { max-width: 600px; }
 .guestbook-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
 .ter-input {
@@ -289,14 +325,21 @@ export default {
 .entry-card { border-left: 2px solid #66ff66; padding: 10px; margin-bottom: 10px; background: rgba(0,255,0,0.05); }
 .entry-name { color: #ff3333; margin-right: 10px; font-weight: bold; }
 
-/* Decorations */
+/* PARTICLES AND HOLO STYLES */
+.particle { position: absolute; background: #66ff66; border-radius: 50%; pointer-events: none; animation: float infinite linear; }
+@keyframes float { 0% { transform: translateY(0); } 100% { transform: translateY(-100vh); } }
+.holo-icon { position: absolute; width: 4px; height: 4px; background: rgba(0, 255, 0, 0.2); pointer-events: none; }
+
+/* AQUILA AND PROFILE */
 .aquila-container { position: absolute; top: 30px; right: 40px; width: 120px; z-index: 5; }
 .aquila { width: 100%; filter: drop-shadow(0 0 5px #0f0); opacity: 0.6; }
 
 .profile-pic-container { position: absolute; bottom: 30px; right: 40px; width: 120px; height: 120px; z-index: 5; }
 .profile-pic { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #0f0; box-shadow: 0 0 15px #0f0; object-fit: cover; }
 
+/* OVERLAYS */
 .scanlines { position: absolute; inset: 0; background: linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px); background-size: 2px 2px; pointer-events: none; }
+.metal-seams { position: absolute; inset: 0; border: 2px solid rgba(255,255,255,0.05); pointer-events: none; }
 
 .user-signature {
   position: absolute;
@@ -310,7 +353,7 @@ export default {
   z-index: 10;
   border-left: 3px solid #66ff66;
   padding-left: 10px;
-  pointer-events: none; /* Keeps it from blocking clicks */
+  pointer-events: none; 
 }
 
 .user-signature .rank {
@@ -319,37 +362,12 @@ export default {
   display: block;
 }
 
-/* Hide on mobile if it gets too crowded, or keep it—it's small! */
+/* RESPONSIVE */
 @media (max-width: 1024px) {
-  .user-signature {
-    bottom: 10px;
-    left: 10px;
-    font-size: 1rem;
-  }
-}
-
-/* MOBILE RESPONSIVENESS */
-@media (max-width: 1024px) {
-  .panel-content {
-    flex-direction: column;
-    padding: 20px;
-    padding-bottom: 100px;
-  }
-  .buttons-area {
-    position: static;
-    transform: none;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  .buttons-area button {
-    min-width: 140px;
-    padding: 8px;
-    font-size: 0.9rem;
-  }
-  .profile-pic-container, .aquila-container {
-    display: none;
-  }
+  .user-signature { bottom: 10px; left: 10px; font-size: 1rem; }
+  .panel-content { flex-direction: column; padding: 20px; padding-bottom: 100px; }
+  .buttons-area { position: static; transform: none; flex-direction: row; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+  .buttons-area button { min-width: 140px; padding: 8px; font-size: 0.9rem; }
+  .profile-pic-container, .aquila-container { display: none; }
 }
 </style>

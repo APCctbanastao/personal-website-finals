@@ -10,29 +10,38 @@ export class GuestbookService {
 
   async getAllEntries() {
     const { data, error } = await this.supabase
-      .from('honorable_guest') // Use your actual table name
+      .from('honorable_guest')
       .select('*')
-      .order('created_at', { ascending: false }); // Ensure this column name is exactly 'created_at' in Supabase
+      .order('created_at', { ascending: false });
     
     if (error) {
-      console.error("Supabase Error:", error.message);
-      // Fallback: Try fetching without ordering if 'created_at' is causing the crash
-      const fallback = await this.supabase.from('honorable_guest').select('*');
-      return fallback.data || [];
+      console.error("Supabase Fetch Error:", error.message);
+      return [];
     }
     return data || [];
   }
 
   async createEntry(name: string, message: string) {
-    return await this.supabase
+    const { data, error } = await this.supabase
       .from('honorable_guest')
-      .insert([{ name, message }]);
+      .insert([{ name: name, message: message }]);
+    
+    if (error) {
+      console.error("Supabase Insert Error:", error.message);
+    }
+    return data;
   }
 
   async deleteEntry(id: string) {
-    return await this.supabase
-      .from('honorable_guest')
-      .delete()
-      .eq('id', id);
+    const { data, error } = await this.supabase
+        .from('honorable_guest')
+        .delete()
+        .eq('id', id); // This matches the 'id' column from your screenshot
+
+    if (error) {
+        console.error("Supabase Redaction Error:", error.message);
+        throw new Error(error.message);
+  }
+  return data;
   }
 }
