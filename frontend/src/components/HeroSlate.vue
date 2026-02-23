@@ -14,6 +14,9 @@
     <div class="hero-slate">
       <div class="metal-seams"></div>
       <div class="scanlines"></div>
+      <div class="user-signature">
+        <span class="rank">OPERATOR:</span> CHRISTIAN BANASTAO
+      </div>
 
       <div class="panel-content">
         <div class="data-area">
@@ -294,6 +297,36 @@ export default {
 .profile-pic { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #0f0; box-shadow: 0 0 15px #0f0; object-fit: cover; }
 
 .scanlines { position: absolute; inset: 0; background: linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px); background-size: 2px 2px; pointer-events: none; }
+
+.user-signature {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: #b6ff9a;
+  font-family: 'VT323', monospace;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+  z-index: 10;
+  border-left: 3px solid #66ff66;
+  padding-left: 10px;
+  pointer-events: none; /* Keeps it from blocking clicks */
+}
+
+.user-signature .rank {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  display: block;
+}
+
+/* Hide on mobile if it gets too crowded, or keep it—it's small! */
+@media (max-width: 1024px) {
+  .user-signature {
+    bottom: 10px;
+    left: 10px;
+    font-size: 1rem;
+  }
+}
 
 /* MOBILE RESPONSIVENESS */
 @media (max-width: 1024px) {
