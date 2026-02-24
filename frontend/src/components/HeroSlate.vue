@@ -177,7 +177,7 @@ export default {
         },
         "Scholasticus":{
           content: "Bachelor of Science in Information Technology.",
-          image: "/images/gala.jpg"
+          image: "/images/porthole.jpg"
         },
         "The Eternal Crusade":{
           content: "Bridging software engineering and sci-fi aesthetics.",
